@@ -1,0 +1,260 @@
+================================================================================
+PHARMACY BACKEND - AUTHENTICATION API DOCUMENTATION
+================================================================================
+
+Base URL: http://localhost:5000/api/auth
+(Replace with your actual backend URL in production)
+
+================================================================================
+1. SIGNUP API
+================================================================================
+
+Endpoint: POST /api/auth/signup
+URL: http://localhost:5000/api/auth/signup
+
+Request Headers:
+Content-Type: application/json
+
+Request Body (JSON):
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "confirmPassword": "password123"
+}
+
+Required Fields:
+- name (string): User's full name
+- email (string): User's email address
+- password (string): Password (minimum 6 characters)
+- confirmPassword (string): Must match password
+
+Success Response (201 Created):
+{
+  "message": "User registered successfully",
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "name": "John Doe",
+    "email": "john@example.com"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+
+Error Responses:
+
+400 Bad Request - Missing fields:
+{
+  "message": "All fields are required"
+}
+
+400 Bad Request - Passwords don't match:
+{
+  "message": "Passwords do not match"
+}
+
+400 Bad Request - Password too short:
+{
+  "message": "Password must be at least 6 characters long"
+}
+
+409 Conflict - Email already exists:
+{
+  "message": "Email already registered"
+}
+
+500 Internal Server Error:
+{
+  "message": "Server error"
+}
+
+================================================================================
+2. LOGIN API
+================================================================================
+
+Endpoint: POST /api/auth/login
+URL: http://localhost:5000/api/auth/login
+
+Request Headers:
+Content-Type: application/json
+
+Request Body (JSON):
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+Required Fields:
+- email (string): User's email address
+- password (string): User's password
+
+Success Response (200 OK):
+{
+  "message": "Logged in successfully",
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "name": "John Doe",
+    "email": "john@example.com"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+
+Error Responses:
+
+400 Bad Request - Missing fields:
+{
+  "message": "Email and password are required"
+}
+
+401 Unauthorized - Invalid credentials:
+{
+  "message": "Invalid credentials"
+}
+
+500 Internal Server Error:
+{
+  "message": "Server error"
+}
+
+================================================================================
+3. TOKEN USAGE
+================================================================================
+
+After successful signup or login, you will receive a JWT token in the response.
+Store this token securely (e.g., localStorage, sessionStorage, or secure cookie).
+
+For future authenticated requests, include the token in the Authorization header:
+
+Authorization: Bearer <your_token_here>
+
+Example:
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+Token expires in: 1 day (24 hours)
+
+================================================================================
+4. FRONTEND INTEGRATION EXAMPLES
+================================================================================
+
+JavaScript/Fetch Example - Signup:
+----------------------------------
+const signup = async (name, email, password, confirmPassword) => {
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        confirmPassword
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      // Store token
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      return data;
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (error) {
+    console.error('Signup error:', error);
+    throw error;
+  }
+};
+
+JavaScript/Fetch Example - Login:
+---------------------------------
+const login = async (email, password) => {
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      // Store token
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      return data;
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+};
+
+Axios Example - Signup:
+------------------------
+import axios from 'axios';
+
+const signup = async (name, email, password, confirmPassword) => {
+  try {
+    const response = await axios.post('http://localhost:5000/api/auth/signup', {
+      name,
+      email,
+      password,
+      confirmPassword
+    });
+    
+    // Store token
+    localStorage.setItem('token', response.data.token);
+    localStorage.setItem('user', JSON.stringify(response.data.user));
+    
+    return response.data;
+  } catch (error) {
+    console.error('Signup error:', error.response?.data?.message || error.message);
+    throw error;
+  }
+};
+
+Axios Example - Login:
+----------------------
+import axios from 'axios';
+
+const login = async (email, password) => {
+  try {
+    const response = await axios.post('http://localhost:5000/api/auth/login', {
+      email,
+      password
+    });
+    
+    // Store token
+    localStorage.setItem('token', response.data.token);
+    localStorage.setItem('user', JSON.stringify(response.data.user));
+    
+    return response.data;
+  } catch (error) {
+    console.error('Login error:', error.response?.data?.message || error.message);
+    throw error;
+  }
+};
+
+================================================================================
+5. NOTES
+================================================================================
+
+- All email addresses are automatically converted to lowercase
+- Passwords are hashed using bcrypt before storage
+- JWT tokens expire after 1 day
+- CORS is enabled, so frontend can make requests from any origin
+- All responses are in JSON format
+- Error messages are user-friendly and can be displayed directly to users
+
+================================================================================
+
