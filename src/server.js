@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
+import medicineTypeRoutes from "./routes/medicineType.js";
 
 // Load env vars
 dotenv.config({
@@ -20,6 +21,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/medicine-type", medicineTypeRoutes);
 
 // Health check
 app.get("/", (req, res) => {
