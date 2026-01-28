@@ -1,4 +1,5 @@
 import express from "express";
+import { authenticator } from "../middleware/authenticator.js";
 import {
   create,
   getAll,
@@ -7,6 +8,8 @@ import {
 } from "../controllers/medicineTypeController.js";
 
 const router = express.Router();
+
+router.use(authenticator);
 
 // POST /api/medicine-type
 router.post("/", create);

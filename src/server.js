@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import medicineTypeRoutes from "./routes/medicineType.js";
+import medicinePurchaseRoutes from "./routes/medicinePurchase.js";
 
 // Load env vars
 dotenv.config({
@@ -22,6 +23,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/medicine-type", medicineTypeRoutes);
+app.use("/api/medicine-purchase", medicinePurchaseRoutes);
 
 // Health check
 app.get("/", (req, res) => {

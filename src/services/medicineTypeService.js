@@ -1,8 +1,8 @@
 import MedicineType from "../models/MedicineType.js";
 
-export const getAllMedicineTypes = async () => {
+export const getAllMedicineTypes = async (userId) => {
   try {
-    const medicineTypes = await MedicineType.find().sort({ createdAt: -1 });
+    const medicineTypes = await MedicineType.find({ user: userId }).sort({ createdAt: -1 });
     return medicineTypes;
   } catch (error) {
     throw error;
@@ -10,7 +10,7 @@ export const getAllMedicineTypes = async () => {
 };
 
 
-export const updateMedicineType = async (id, data) => {
+export const updateMedicineType = async (id, data, userId) => {
   try {
     const { companyName, type } = data;
 
@@ -87,8 +87,8 @@ export const updateMedicineType = async (id, data) => {
         throw new Error("Invalid medicine type");
     }
 
-    const medicineType = await MedicineType.findByIdAndUpdate(
-      id,
+    const medicineType = await MedicineType.findOneAndUpdate(
+      { _id: id, user: userId },
       medicineTypeData,
       { new: true, runValidators: true }
     );
@@ -103,9 +103,9 @@ export const updateMedicineType = async (id, data) => {
   }
 };
 
-export const deleteMedicineType = async (id) => {
+export const deleteMedicineType = async (id, userId) => {
   try {
-    const medicineType = await MedicineType.findByIdAndDelete(id);
+    const medicineType = await MedicineType.findOneAndDelete({ _id: id, user: userId });
     if (!medicineType) {
       throw new Error("Medicine type not found");
     }
@@ -115,7 +115,7 @@ export const deleteMedicineType = async (id) => {
   }
 };
 
-export const createMedicineType = async (data) => {
+export const createMedicineType = async (data, userId) => {
   try {
     // Validate required fields based on type
     const { companyName, type } = data;
@@ -126,6 +126,7 @@ export const createMedicineType = async (data) => {
 
     // Validate type-specific fields
     let medicineTypeData = {
+      user: userId,
       companyName: companyName.trim(),
       type,
     };

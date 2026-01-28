@@ -7,7 +7,11 @@ import {
 
 export const create = async (req, res) => {
   try {
-    const medicineType = await createMedicineType(req.body);
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    const medicineType = await createMedicineType(req.body, userId);
 
     return res.status(201).json({
       message: "Medicine type created successfully",
@@ -23,7 +27,11 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    const medicineTypes = await getAllMedicineTypes();
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    const medicineTypes = await getAllMedicineTypes(userId);
 
     return res.status(200).json({
       message: "Medicine types retrieved successfully",
@@ -40,8 +48,12 @@ export const getAll = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
     const { id } = req.params;
-    const medicineType = await updateMedicineType(id, req.body);
+    const medicineType = await updateMedicineType(id, req.body, userId);
 
     return res.status(200).json({
       message: "Medicine type updated successfully",
@@ -57,8 +69,12 @@ export const update = async (req, res) => {
 
 export const deleteById = async (req, res) => {
   try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
     const { id } = req.params;
-    await deleteMedicineType(id);
+    await deleteMedicineType(id, userId);
 
     return res.status(200).json({
       message: "Medicine type deleted successfully",
@@ -70,4 +86,3 @@ export const deleteById = async (req, res) => {
     });
   }
 };
-
